@@ -33,7 +33,7 @@ Client -request-> Router -> controller -> service -> Controller -response-> Clie
 ** Handler
 @Get, @Post, @Delete... etc
 
-** body param
+** body
 ``` ts
 @Post("/create")
 createBoard(@Body() body): Board {} // body 전체 받기
@@ -44,6 +44,23 @@ createBoard(
     @Body("description") description: string, 
 ): Board {
     return this.boardService.createBoard(title, description);
+}
+```
+
+** param
+``` ts
+@Get("/:id")
+getBoardById(
+    @Param() params: string[], // param 전체
+): Board {
+    return this.boardService.getBoardById(id);
+}
+
+@Get("/:id")
+getBoardById(
+    @Param("id") id: string, // 선택해서 가져오기
+): Board {
+    return this.boardService.getBoardById(id);
 }
 ```
 
@@ -67,6 +84,12 @@ constructor(private boardService : BoardsService) {}
 
 * model
 interface 아니면 class 사용
+
+* dto (data transfer object)
+계층간 데이터 교환을 위한 객체
+DB에서 데이터를 얻을때 등에서 사용
+데이터 유효성 체크에 효율적이며 더 안정적인 코드 작성 가능
+일반적으로 class가 더 선호된다 - 런타임에서 작동하기 때문에 파이프 같은 기능을 이용할때 더 유용
 
 - 구현 목표
 BoardModule

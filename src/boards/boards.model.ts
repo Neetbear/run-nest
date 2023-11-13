@@ -3,6 +3,8 @@ export interface Board {
     title: string;
     description: string;
     status: BoardStatus;
+    createdAt: Date;
+    updatedAt: Date;
 }
 
 export enum BoardStatus {
