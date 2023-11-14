@@ -24,7 +24,7 @@ build, format, start
 프로젝트 로직 파일 
 
 - API 동작 구조
-Client -request-> Router -> controller -> service -> Controller -response-> Client
+Client -request-> Router -> controller -> service -> repository -> service -> Controller -response-> Client
 
 * controller
 들어오는 요청을 처리하고 클라이언트에 응답값을 반환한다
@@ -112,3 +112,84 @@ nest g controller boards --no-spec
 
 * service 생성
 nest g service boards --no-spec
+
+
+- pipe
+@injectable () 데코레이터 클래스
+data transformation과 data validation을 위해서 사용
+컨트롤러 경로 처리기에 의해 처리되는 인수에 대해 작동
+Nest는 메소드가 호출되기 직전에 파이프를 삽입하고 파이프는 메소드로 향하는 인수를 수신하여 이에 대해 작동
+
+* data transformation
+입력 데이터를 원하는 형식으로 변환 (string -> int)
+
+* data validation
+입력 데이터의 유효성 체크 (string length 등)
+
+* binding pipes
+파이프 사용법 : Handler-level Pipes, Parameter-level Pipes, Global-level Pipes
+Handler-level Pipes : 특정 핸들러만
+``` ts
+@Post("/create")
+@UsePipes(ValidationPipe)
+createBoard(
+    @Body() createBoardDto: CreateBoardDto,
+): Board {
+    return this.boardService.createBoard(createBoardDto);
+}
+```
+Parameter-level Pipes : 특정 파라미터에만
+```ts
+@Get("/:id")
+getBoardById(
+    @Param("id", ParseUUIDPipe) id: string,
+): Board {
+    return this.boardService.getBoardById(id);
+}
+```
+Global-level Pipes : 애플리케이션 레벨 -> 클라이언트에서 들어오는 모든 요청에 적용
+
+* Built-in Pipes
+Nest에서 프로젝트 생성시 기본적으로 존재하는 6가지 파이프
+Validation Pipe
+ParseInt Pipe
+ParseBool Pipe
+ParseArray Pipe
+ParseUUID Pipe
+DefaultValue Pipe
+
+* 추가 라이브러리
+class-validator, class-transformer
+npm install class-validator class-transformer --save
+
+* 커스텀 파이프
+PipeTransform 인터페이스
+transform 메소드 - 파라미터로 value와 metadata
+```
+value sdfdsf
+metadata { metatype: [Function: String], type: 'body', data: 'status' }
+```
+
+- Postgres
+PostgresSQL
+pgAdmin
+
+- TypeORM (object relational mapping)
+node.js에서 실행되고 typesript로 작성된 객체 관계형 매퍼 라이브러리
+MySQL, PostgresSQL, MariaDB, SQlite, MSSQL, Oracle, SAP Hana, WebSQL과 같은 여러 데이터베이스 지원
+
+* ORM
+객체와 관계형 데이터베이스의 데이터를 자동으로 변형 및 연결하는 작업
+객체와 관계형 DB를 매핑
+```
+npm install pg typeorm @nestjs/typeorm --save
+```
+
+* entities
+@Entity()
+데이터베이스 개체
+
+- Repository
+엔티티 객체와 함께 작동하며 DB CRUD 처리 
+service로부터 받은 DB 관련 동작 처리
+@EntityRepository()
