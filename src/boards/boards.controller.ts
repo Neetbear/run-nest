@@ -1,8 +1,9 @@
-import { Controller, Get, Post, Delete, Patch, Body, Param, ParseUUIDPipe, ValidationPipe, UsePipes } from '@nestjs/common';
+import { Controller, Get, Post, Delete, Patch, Body, Param, ValidationPipe, UsePipes, ParseIntPipe } from '@nestjs/common';
 import { BoardsService } from './boards.service';
-import { Board, BoardStatus} from './boards.model';
+import { BoardStatus} from './model/boards_status.model';
 import { CreateBoardDto } from './dto/create_board.dto';
 import { BoardStatusValidationPipe } from './pipes/board_status_validation.pipe';
+import { Board } from './boards.entity';
 
 @Controller('boards')
 export class BoardsController {
@@ -13,7 +14,7 @@ export class BoardsController {
     constructor(private boardService : BoardsService) {}
 
     @Get("/all") 
-    getAllBoards(): Board[] {
+    getAllBoards(): Promise <Board[]> {
         return this.boardService.getAllBoards();
     }
 
@@ -21,29 +22,29 @@ export class BoardsController {
     @UsePipes(ValidationPipe)
     createBoard(
         @Body() createBoardDto: CreateBoardDto,
-    ): Board {
+    ): Promise <Board> {
         return this.boardService.createBoard(createBoardDto);
     }
 
     @Get("/:id")
     getBoardById(
-        @Param("id", ParseUUIDPipe) id: string,
-    ): Board {
+        @Param("id", ParseIntPipe) id: number,
+    ): Promise <Board> {
         return this.boardService.getBoardById(id);
     }
 
     @Delete("/:id")
     deleteBoardById(
-        @Param("id", ParseUUIDPipe) id: string,
-    ): void {
-        this.boardService.deleteBoardById(id)
+        @Param("id", ParseIntPipe) id: number,
+    ): Promise <void> {
+        return this.boardService.deleteBoardById(id)
     }
 
     @Patch("/:id/status")
     updateBoardStatusById(
-        @Param("id", ParseUUIDPipe) id: string,
+        @Param("id", ParseIntPipe) id: number,
         @Body("status", BoardStatusValidationPipe) boardStatus: BoardStatus,
-    ): Board {
+    ): Promise <Board> {
         return this.boardService.updateBoardStatusById(id, boardStatus)
     }
 }

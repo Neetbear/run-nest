@@ -193,3 +193,15 @@ npm install pg typeorm @nestjs/typeorm --save
 엔티티 객체와 함께 작동하며 DB CRUD 처리 
 service로부터 받은 DB 관련 동작 처리
 @EntityRepository()
+
+* service에 repository 주입
+``` ts
+constructor(
+    @InjectRepository(BoardRepository)
+    private boardRepository: BoardRepository,
+) {}
+```
+
+* remove vs delete
+remove : 무조건 삭제라 없어서 삭제 실패시 에러 발생
+delete : 만약 해당 조건의 데이터가 존재시에만 삭제 (없으면 아무런 영향이 없다)

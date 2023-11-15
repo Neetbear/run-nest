@@ -1,19 +1,19 @@
 import { BaseEntity, Column, Entity, PrimaryGeneratedColumn } from "typeorm";
-import { BoardStatus } from "./model/boards_status.model";
+import { UserRole } from "./model/user_role.model";
 
 @Entity()
-export class Board extends BaseEntity {
+export class User extends BaseEntity {
     @PrimaryGeneratedColumn()
     id: number;
 
     @Column()
-    title: string;
+    username: string;
 
     @Column()
-    description: string;
+    password: string;
 
     @Column()
-    status: BoardStatus;
+    role: UserRole;
 
     @Column()
     createdAt: Date;

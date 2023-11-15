@@ -1,56 +1,56 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { Board, BoardStatus } from './boards.model';
+import { BoardStatus } from './model/boards_status.model';
 import { v1 as uuid } from 'uuid';
 import { CreateBoardDto } from './dto/create_board.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { BoardRepository } from './boards.repository';
+import { Board } from './boards.entity';
 
 @Injectable()
 export class BoardsService {
-    private boards : Board[] = []; // DB 대체용
+    // private boards : Board[] = []; // DB 대체용
 
-    getAllBoards(): Board[] { // return 값 타입 지정
-        return this.boards;
+    constructor(
+        @InjectRepository(BoardRepository)
+        private boardRepository: BoardRepository,
+    ) {}
+
+    async getAllBoards(): Promise <Board[]> { // return 값 타입 지정
+        // find는 옵션 안주면 전체 가져온다
+        return await this.boardRepository.find();
     }
 
-    createBoard(createBoardDto : CreateBoardDto): Board {
-        const {title, description} = createBoardDto;
-        let currentTime: Date = new Date();
-        const board: Board = {
-            id : uuid(),
-            title,
-            description,
-            status: BoardStatus.PUBLIC,
-            createdAt: currentTime,
-            updatedAt: currentTime
-        }
-
-        this.boards.push(board);
-        return board;
+    createBoard(createBoardDto : CreateBoardDto): Promise <Board> {
+        return this.boardRepository.createBoard(createBoardDto);
     }
 
-    getBoardById(id: string): Board {
-        const found = this.boards.find((board) => board.id === id);
-
+    async getBoardById(id: number): Promise <Board> {
+        // const found = this.boards.find((board) => board.id === id);
+        const found = await this.boardRepository.findOne({where: {id: id}});
         if (!found) {
-            throw new NotFoundException(`Can't find Board with id ${id}`);
-        }
-
+            throw new NotFoundException(`Can't find Board with id ${id}`)
+        };
         return found;
     }
 
-    deleteBoardById(id: string): void {
+    async deleteBoardById(id: number): Promise <void> {
         // this.boards.filter((board) => board.id === id);
-        const found = this.getBoardById(id);
-        this.boards = this.boards.filter((board) => board.id !== found.id)
+        const result = await this.boardRepository.delete(id);
+        // console.log("result :", result) // result : DeleteResult { raw: [], affected: 0 }
+
+        if (result.affected === 0) {
+            throw new NotFoundException(`Can't find board with id ${id}`)
+        }
     }
 
-    updateBoardStatusById(id: string, status: BoardStatus): Board {
+    async updateBoardStatusById(id: number, status: BoardStatus): Promise <Board> {
         // // enum 객체에 맞는 값인지 검증 -> 이런 방법 안쓰고 pipe로 한다
         // if (!Object.values(BoardStatus).includes(status)) {
         //     throw new Error(`Invalid status: ${status}`);
         // }
-
-        const board = this.getBoardById(id)
-        board.status = status
+        const board = await this.getBoardById(id);
+        board.status = status;
+        await this.boardRepository.save(board);
         return board
     }
 }

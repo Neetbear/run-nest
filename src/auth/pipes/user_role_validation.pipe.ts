@@ -1,10 +1,10 @@
 import { ArgumentMetadata, BadRequestException, PipeTransform } from "@nestjs/common";
-import { BoardStatus} from '../model/boards_status.model';
+import { UserRole} from '../model/user_role.model';
 
 export class BoardStatusValidationPipe implements PipeTransform {
     readonly StatusOptions = [ // readonly 접두사 : 값 변경 불가능
-        BoardStatus.PUBLIC,
-        BoardStatus.PRIVATE
+        UserRole.ADMIN,
+        UserRole.User
     ]
 
     transform(value: any, metadata: ArgumentMetadata) {
