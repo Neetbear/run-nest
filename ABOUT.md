@@ -205,3 +205,22 @@ constructor(
 * remove vs delete
 remove : 무조건 삭제라 없어서 삭제 실패시 에러 발생
 delete : 만약 해당 조건의 데이터가 존재시에만 삭제 (없으면 아무런 영향이 없다)
+
+* bcryptjs
+비밀번호 암호화 저장에 사용
+npm install bcryptjs --save
+npm i --save @types/bcryptjs 
+단방향 암호화
+
+- jwt (json web token)
+당사자간의 정보를 json 객체로 안전하게 전송하기 위한 컴팩트하고 독립적인 방식
+
+* 구조
+header - payload - verify signature
+header - 토큰에 대한 메타데이터 (타입, 해싱 알고리즘 등)
+payload - 유저 정보, 만료기간, 주제 등 정보
+verify signature - 서명
+
+서버에서 가지고 있던 정보로 다시 생성해서 signature가 일치하면 통과
+
+npm install @nestjs/jwt @nestjs/passport passport passport-jwt --save

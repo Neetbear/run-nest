@@ -12,4 +12,18 @@ export class AuthController {
     ): Promise <void> {
         return this.authService.signUp(authCredentialDto);
     }
+
+    @Post("/signin")
+    signIn(
+        @Body(ValidationPipe) authCredentialDto: AuthCredentialDto
+    ): Promise<{accessToken: string}> {
+        return this.authService.signIn(authCredentialDto);
+    }
+
+    // @Post("/delete")
+    // deleteUser(
+    //     @Body("username") username: string
+    // ): Promise<void>{
+    //     return this.authService.deleteUser(username);
+    // }
 }
