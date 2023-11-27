@@ -1,5 +1,6 @@
-import { BaseEntity, Column, Entity, PrimaryGeneratedColumn, Unique } from "typeorm";
+import { BaseEntity, Column, Entity, OneToMany, PrimaryGeneratedColumn, Unique } from "typeorm";
 import { UserRole } from "./model/user_role.model";
+import { Board } from "src/boards/boards.entity";
 
 @Entity()
 @Unique(["username"])
@@ -21,4 +22,7 @@ export class User extends BaseEntity {
 
     @Column()
     updatedAt: Date;
+
+    @OneToMany(type => Board, board => board.user, {eager: true})
+    boards: Board[]
 }

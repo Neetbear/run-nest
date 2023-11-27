@@ -223,4 +223,52 @@ verify signature - 서명
 
 서버에서 가지고 있던 정보로 다시 생성해서 signature가 일치하면 통과
 
-npm install @nestjs/jwt @nestjs/passport passport passport-jwt --save
+npm install @nestjs/jwt @nestjs/passport passport passport-jwt @types/passport-jwt --save
+
+* middleware
+pipes : 유효성 검사 및 페이로드 변환
+filters : 오류 처리
+guards : 인증
+interceptors : 응답 매핑 및 캐시 관리, 요청 로깅
+
+* 커스텀 데코레이터
+
+* 유저와 게시물 데이터의 관계
+유저 one <-> many 게시글
+``` ts
+// user entity
+@OneToMany(type => Board, board => board.user, {eager: true})
+boards: Board[]
+
+// board ent
+@ManyToOne(type => User, user => user.boards, {eager: false})
+user: User;
+```
+
+- eager
+TypeORM에서 Eager Relations관계를 설정해 두면, 상위 엔티티를 로드했을 때, 그 하위 엔티티까지 모두 로드되게 된다. 
+이는 Entity 클래스에서 eager 옵션을 true 로 두면 사용할 수 있다. 
+
+* log
+log : 중요한 정보의 범용 로깅
+warning : 치명적이거나 파괴적인 않은 처리되지 않은 문제
+error : 치명적이거나 파괴적인 처리되지 않은 문제
+fatal : 시스템이나 프로그램이 더 이상 실행될 수 없는 상태의 문제
+debug : 오류 발생시 로직을 디버그하는데 도움이되는 유용한 정보 (개발자 용) - 디버그 수준 로그 용
+verbose : 응용 프로그램의 동작에 대한 통찰력을 제공하는 정보 (운영자 용) - 상세 로그 용
+
+expressjs에서는 winston 사용
+nestjs에서는 이미 built-in된 logger 클래스 사용
+
+* 설정파일
+runtime중 바뀌는게 아닌 애플리케이션이 시작할 때 로드되어 사용하는 값들의 정의가 있는 파일
+xml, json, yaml 등등 사용
+노출되어되 되는 경우에는 codebase에 두고 아니면 환경 변수 처리
+npm installing -g win-node-env (윈도우만)
+npm install config --save
+
+default - 기본설정
+development - 개발환경
+production - 운영환경
+
+synchronize: true -> 운영에서는 false로 해주는게 좋다

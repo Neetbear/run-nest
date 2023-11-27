@@ -3,6 +3,7 @@ import { Board } from "./boards.entity";
 import { Injectable } from "@nestjs/common";
 import { CreateBoardDto } from "./dto/create_board.dto";
 import { BoardStatus } from "./model/boards_status.model";
+import { User } from "src/auth/user.entity";
 
 // @EntityRepository(Board) // 이젠 사라진 기능이라 사용 불가
 @Injectable()
@@ -15,7 +16,7 @@ export class BoardRepository extends Repository<Board> {
     // 	return await this.findOne({where: {id: id}});
     // }
 
-    async createBoard(createBoard: CreateBoardDto): Promise <Board> {
+    async createBoard(createBoard: CreateBoardDto, user: User): Promise <Board> {
         const {title, description} = createBoard;
         const currentTime: Date = new Date();
         const board = this.create({
@@ -23,7 +24,8 @@ export class BoardRepository extends Repository<Board> {
             description,
             status: BoardStatus.PUBLIC,
             createdAt: currentTime,
-            updatedAt: currentTime
+            updatedAt: currentTime,
+            user
         });
         await this.save(board);
         return board;

@@ -5,6 +5,7 @@ import { CreateBoardDto } from './dto/create_board.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { BoardRepository } from './boards.repository';
 import { Board } from './boards.entity';
+import { User } from 'src/auth/user.entity';
 
 @Injectable()
 export class BoardsService {
@@ -20,8 +21,15 @@ export class BoardsService {
         return await this.boardRepository.find();
     }
 
-    createBoard(createBoardDto : CreateBoardDto): Promise <Board> {
-        return this.boardRepository.createBoard(createBoardDto);
+    async getAllBoardsByUser(user: User): Promise <Board[]> { 
+        const query = this.boardRepository.createQueryBuilder("board"); // find, findOne 등 사용 못할때 커스텀 쿼리 용
+        query.where("board.userId = :userId", {userId: user.id})
+        const boards = await query.getMany();
+        return boards;
+    }
+
+    createBoard(createBoardDto : CreateBoardDto, user: User): Promise <Board> {
+        return this.boardRepository.createBoard(createBoardDto, user);
     }
 
     async getBoardById(id: number): Promise <Board> {
@@ -33,10 +41,12 @@ export class BoardsService {
         return found;
     }
 
-    async deleteBoardById(id: number): Promise <void> {
+    async deleteBoardById(id: number, user: User): Promise <void> {
         // this.boards.filter((board) => board.id === id);
-        const result = await this.boardRepository.delete(id);
+        // const result = await this.boardRepository.delete(id);
         // console.log("result :", result) // result : DeleteResult { raw: [], affected: 0 }
+        const query = this.boardRepository.createQueryBuilder("board").delete().from(Board).where("userId = :userId", {userId: user.id}).andWhere("id = :id", {id: id});
+        const result = await query.execute();
 
         if (result.affected === 0) {
             throw new NotFoundException(`Can't find board with id ${id}`)
@@ -49,7 +59,7 @@ export class BoardsService {
         //     throw new Error(`Invalid status: ${status}`);
         // }
         const board = await this.getBoardById(id);
-        board.status = status;
+        board.status = status; 
         await this.boardRepository.save(board);
         return board
     }
